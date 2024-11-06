@@ -5,6 +5,7 @@
     <NuxtLink to="/" class="mb-10 block">
       <NuxtImg width="100px" src="/favicon.ico" class="mx-auto" />
     </NuxtLink>
+    <UiButton> Send </UiButton>
   </aside>
 </template>
 

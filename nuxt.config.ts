@@ -7,9 +7,10 @@ export default defineNuxtConfig({
     "@nuxtjs/tailwindcss",
     "shadcn-nuxt",
     "@nuxtjs/color-mode",
+    "@nuxtjs/google-fonts",
   ],
   shadcn: {
-    prefix: "",
+    prefix: "Ui",
 
     componentDir: "./components/ui",
   },
