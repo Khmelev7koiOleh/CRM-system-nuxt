@@ -3,6 +3,7 @@
 <template>
   <section class="grid" style="min-height: 100vh">
     <LayoutSidebar />
+
     <div>
       <slot />
     </div>
