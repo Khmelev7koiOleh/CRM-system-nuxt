@@ -3,11 +3,8 @@
 <template>
   <aside class="px-5 py-8 bg-sidebar h-full relative w-full">
     <NuxtLink to="/" class="mb-10 block">
-      <NuxtImg width="100px" src="/favicon.ico" class="mx-auto" />
+      <NuxtImg width="100px" src="/icon-green.png" class="mx-auto" />
     </NuxtLink>
-
-    <!-- Uncomment the following line if the UiButton component is defined -->
-    <!-- <UiButton>Send</UiButton> -->
 
     <button
       class="absolute top-5 right-5 transition-colors hover:text-purple-400"
