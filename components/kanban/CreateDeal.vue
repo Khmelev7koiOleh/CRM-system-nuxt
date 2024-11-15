@@ -3,7 +3,7 @@ import { ref } from "vue";
 import { useMutation } from "@tanstack/vue-query";
 import { v4 as uuid } from "uuid";
 import { defineProps } from "vue";
-import { DB_ID, COLLECTIONS_DEALS } from "~~/utils/app.constants";
+import { DB_ID, COLLECTION_DEALS } from "~~/utils/app.constants";
 import type { IDeal } from "~/types/deals.types";
 import { useForm } from "vee-validate";
 const isOpen = ref(false);
@@ -40,7 +40,7 @@ const [customerName, customerNameAttrs] = defineField("customer.name");
 const { mutate, isPending } = useMutation({
   mutationKey: ["create a new deal"],
   mutationFn: (data: IDealFormState) =>
-    DB.createDocument(DB_ID, COLLECTIONS_DEALS, uuid(), data),
+    DB.createDocument(DB_ID, COLLECTION_DEALS, uuid(), data),
 
   onSuccess(data) {
     props.refetch && props.refetch();
@@ -88,7 +88,7 @@ const onSubmit = handleSubmit((values) => {
       v-bind="priceAttrs"
       v-model="price"
       class="input"
-      type="text"
+      type="number"
     />
     <UiInput
       placeholder="Email"
