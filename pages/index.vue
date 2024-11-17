@@ -10,6 +10,7 @@ import { DB } from "~~/utils/appwrite";
 import { COLLECTION_DEALS, DB_ID } from "~~/utils/app.constants";
 
 import { useMutation } from "@tanstack/vue-query";
+import { generateColumnStyle } from "~/components/kanban/generate-gradient";
 
 const dragCardRef = ref<ICard | null>(null);
 const sourceColumnRef = ref<IColumn | null>(null);
@@ -60,8 +61,12 @@ function handleDrop(targetColumn: IColumn) {
           :key="column.id"
           @dragover="handleDragOver"
           @drop="handleDrop(column)"
+          class="min-h-screen"
         >
-          <div class="rounded-md bg-slate-700 py-1 px-5 mb-3 text-center">
+          <div
+            class="rounded-md bg-slate-700 py-1 px-5 mb-3 text-center"
+            :style="generateColumnStyle(index, data?.length)"
+          >
             {{ column.name }}
           </div>
 

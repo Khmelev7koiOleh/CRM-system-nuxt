@@ -1,4 +1,4 @@
-import type { ICard } from "./kanban.types";
+import type { ICard, IColumn } from "./kanban.types";
 
 import { useQuery } from "@tanstack/vue-query";
 import { KANBAN_DATA } from "./kanban.data";
@@ -10,7 +10,14 @@ export function useKanbanQuery() {
     queryKey: ["deals"],
     queryFn: () => DB.listDocuments(DB_ID, COLLECTION_DEALS),
     select(data) {
-      const newBoard = [...KANBAN_DATA];
+      // const newBoard = [...KANBAN_DATA];
+
+      // const newBoard: IColumn[] = JSON.parse(JSON.stringify(KANBAN_DATA));
+
+      const newBoard: IColumn[] = KANBAN_DATA.map((column) => ({
+        ...column,
+        items: [],
+      }));
       const deals = data.documents as unknown as IDeal[];
 
       for (const deal of deals) {
@@ -27,7 +34,7 @@ export function useKanbanQuery() {
           });
         }
       }
-      console.log(newBoard);
+
       return newBoard;
     },
   });
