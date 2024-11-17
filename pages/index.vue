@@ -12,9 +12,13 @@ import { COLLECTION_DEALS, DB_ID } from "~~/utils/app.constants";
 import { useMutation } from "@tanstack/vue-query";
 import { generateColumnStyle } from "~/components/kanban/generate-gradient";
 
+import { useDealSlideStore } from "~~/store/deal-slide.store";
+
 const dragCardRef = ref<ICard | null>(null);
 const sourceColumnRef = ref<IColumn | null>(null);
 const { data, isLoading, refetch } = useKanbanQuery();
+
+const store = useDealSlideStore();
 
 type TypeMutationVariables = {
   docId: string;
@@ -79,7 +83,7 @@ function handleDrop(targetColumn: IColumn) {
               :key="card.id"
               @dragstart="handelDragStart(card, column)"
             >
-              <UiCardHeader role="button">
+              <UiCardHeader role="button" @click="store.set(card)">
                 <UiCardTitle>{{ card.name }}</UiCardTitle>
 
                 <UiCardDescription>{{
@@ -97,6 +101,7 @@ function handleDrop(targetColumn: IColumn) {
           </div>
         </div>
       </div>
+      <KanbanSlideover />
     </div>
   </div>
 </template>

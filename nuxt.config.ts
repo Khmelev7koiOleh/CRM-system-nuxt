@@ -4,7 +4,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: [
     "@nuxt/image",
-    "@nuxtjs/tailwindcss",
+    "@nuxt/ui",
     "shadcn-nuxt",
     "@nuxtjs/color-mode",
     [
