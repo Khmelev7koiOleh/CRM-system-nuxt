@@ -9,7 +9,7 @@
           divider: 'divide-y divide-border',
         }"
       >
-        <template #hreader>
+        <template #header>
           <KanbanSlideoverTop />
         </template>
         <KanbanSlideoverComments />
