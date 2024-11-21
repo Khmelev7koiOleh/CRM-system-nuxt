@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { onMounted, watch } from "vue";
 import { storage, DB } from "@/utils/appwrite"; // Import appwrite services
 import { v4 as uuid } from "uuid"; // Import uuid for unique file ids
 import { useMutation, useQuery } from "@tanstack/vue-query";
@@ -73,6 +74,10 @@ const { mutate, isPending } = useMutation({
 const { mutate: uploadImage, isPending: isUploadImagePending } = useMutation({
   mutationKey: ["uploadImage"],
   mutationFn: (file: File) => storage.createFile(STORAGE_ID, uuid(), file),
+  /**
+   * Updates the avatar_url form field with the URL of the uploaded image.
+   * @param {{ $id: string }} data - The response data from the mutation.
+   */
   onSuccess(data) {
     const response = storage.getFileDownload(STORAGE_ID, data.$id);
     setFieldValue("avatar_url", response);
@@ -91,6 +96,12 @@ function handleFileChange(event: InputFileEvent) {
     uploadImage(file);
   }
 }
+
+onMounted(() => {
+  console.log("Endpoint:", import.meta.env.VITE_APPWRITE_ENDPOINT);
+  console.log("Project ID:", import.meta.env.VITE_APPWRITE_PROJECT_ID);
+  console.log("Customer Data:", data);
+});
 </script>
 
 <template>
