@@ -1,9 +1,13 @@
 <script setup lang="ts">
-import { storage } from "@/utils/appwrite";
+import { storage, DB } from "@/utils/appwrite"; // Unified import from utils
 import { v4 as uuid } from "uuid";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import { COLLECTION_CUSTOMERS, DB_ID, STORAGE_ID } from "@/utils/app.constants";
 import type { ICustomer } from "~/types/deals.types";
+
+const config = useRuntimeConfig();
+const endpoint = config.public.appwriteEndpoint;
+const projectId = config.public.appwriteProjectId;
 
 interface InputFileEvent extends Event {
   target: HTMLInputElement;
@@ -25,19 +29,29 @@ const { handleSubmit, defineField, setFieldValue, setValues, values } =
 
 const { data, isSuccess } = useQuery({
   queryKey: ["getCustomer", customerId],
-  queryFn: () => DB.getDocument(DB_ID, COLLECTION_CUSTOMERS, customerId),
+  queryFn: async () => {
+    const doc = await DB.getDocument(DB_ID, COLLECTION_CUSTOMERS, customerId);
+    // Transform the document into ICustomerFormState format
+    return {
+      email: doc.email, // Assuming the document has these fields
+      name: doc.name,
+      avatar_url: doc.avatar_url,
+      from_source: doc.from_source,
+    };
+  },
 });
-
+// Set form values once data is successfully loaded
 watch(isSuccess, () => {
-  const initialData = data.value as unknown as ICustomerFormState;
-  setValues({
-    email: initialData.email,
-    name: initialData.name,
-    avatar_url: initialData.avatar_url,
-    from_source: initialData.from_source,
-  });
+  if (data.value) {
+    setValues({
+      email: data.value.email,
+      name: data.value.name,
+      avatar_url: data.value.avatar_url,
+      from_source: data.value.from_source,
+    });
+  }
 });
-
+// 1
 const [name, nameAttrs] = defineField("name");
 const [email, emailAttrs] = defineField("email");
 const [from_source, from_sourceAttrs] = defineField("from_source");
@@ -48,13 +62,12 @@ const { mutate, isPending } = useMutation({
     DB.updateDocument(DB_ID, COLLECTION_CUSTOMERS, customerId, data),
 });
 
+// Image upload mutation
 const { mutate: uploadImage, isPending: isUploadImagePending } = useMutation({
   mutationKey: ["uploadImage"],
   mutationFn: (file: File) => storage.createFile(STORAGE_ID, uuid(), file),
-
   onSuccess(data) {
     const response = storage.getFileDownload(STORAGE_ID, data.$id);
-
     setFieldValue("avatar_url", response);
   },
 });
@@ -75,7 +88,7 @@ function handleFileChange(event: InputFileEvent) {
   <div class="p-10">
     <h1 class="font-bold text-2xl mb-10">
       <span class="mr-2">Editing</span>
-      {{ (data as unknown as ICustomerFormState)?.name }}
+      {{ values.name }}
     </h1>
 
     <form @submit="onSubmit" class="form">
@@ -104,7 +117,7 @@ function handleFileChange(event: InputFileEvent) {
       <img
         v-if="values.avatar_url || isUploadImagePending"
         :src="values.avatar_url"
-        alt=""
+        alt="Avatar"
         width="50"
         height="50"
         class="rounded-full my-4"
