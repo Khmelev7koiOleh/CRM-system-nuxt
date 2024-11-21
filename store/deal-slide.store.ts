@@ -1,4 +1,3 @@
-import { set } from "@vueuse/core";
 import type { ICard } from "~/components/kanban/kanban.types";
 
 const defaultValue: { card: ICard | null; isOpen: boolean } = {
@@ -13,7 +12,9 @@ export const useDealSlideStore = defineStore("deal-slide", {
       this.$patch(defaultValue);
     },
     set(card: ICard) {
-      this.$patch({ card, isOpen: true });
+      const mutableCard = { ...card }; // Create a shallow copy to make it mutable
+      mutableCard.status = "newStatus"; // Modify the copy
+      this.$patch({ card: mutableCard, isOpen: true }); // Update the store with the new card
     },
     toggle() {
       this.isOpen = !this.isOpen;
