@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { storage } from "@/utils/appwrite";
-import { v4 as uuid } from "uuid";
+import { storage, DB } from "@/utils/appwrite"; // Import appwrite services
+import { v4 as uuid } from "uuid"; // Import uuid for unique file ids
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import { COLLECTION_CUSTOMERS, DB_ID, STORAGE_ID } from "@/utils/app.constants";
 import type { ICustomer } from "~/types/deals.types";
+import { account } from "~~/utils/appwrite";
 
 interface InputFileEvent extends Event {
   target: HTMLInputElement;
@@ -54,7 +55,6 @@ const { mutate: uploadImage, isPending: isUploadImagePending } = useMutation({
 
   onSuccess(data) {
     const response = storage.getFileDownload(STORAGE_ID, data.$id);
-
     setFieldValue("avatar_url", response);
   },
 });
