@@ -1,3 +1,12 @@
+<template>
+  <section :class="{ grid: store.isAuth }" style="min-height: 100vh">
+    <LayoutSidebar v-if="store.isAuth" />
+    <div>
+      <slot />
+    </div>
+  </section>
+</template>
+
 <script setup lang="ts">
 import { account } from "~/utils/appwrite";
 import { useAuthStore, useIsLoadingStore } from "~/store/auth.store";
@@ -17,16 +26,6 @@ onMounted(async () => {
   }
 });
 </script>
-
-<template>
-  <section :class="{ grid: store.isAuth }" style="min-height: 100vh">
-    <LayoutSidebar v-if="store.isAuth" />
-
-    <div>
-      <slot />
-    </div>
-  </section>
-</template>
 
 <style scoped>
 .grid {
