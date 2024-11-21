@@ -11,6 +11,6 @@ client
 // Initialize Appwrite services (you can use these services to interact with Appwrite)
 const account = new Account(client);
 const databases = new Databases(client);
-const storage = new Storage(client);
+const storageA = new Storage(client);
 
-export { client, account, databases, storage };
+export { client, account, databases, storageA };

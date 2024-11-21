@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { storage, DB } from "@/utils/appwrite"; // Import appwrite services
-import { v4 as uuid } from "uuid"; // Import uuid for unique file ids
+import { storage, DB } from "@/utils/appwrite"; // Unified import from utils
+import { v4 as uuid } from "uuid";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import { COLLECTION_CUSTOMERS, DB_ID, STORAGE_ID } from "@/utils/app.constants";
 import type { ICustomer } from "~/types/deals.types";
-import { account } from "~~/utils/appwrite";
 
 const config = useRuntimeConfig();
 const endpoint = config.public.appwriteEndpoint;
@@ -28,19 +27,21 @@ const customerId = route.params.id as string;
 const { handleSubmit, defineField, setFieldValue, setValues, values } =
   useForm<ICustomerFormState>();
 
-const { data, isSuccess } = useQuery({
+const { data, isSuccess } = useQuery<ICustomerFormState>({
   queryKey: ["getCustomer", customerId],
   queryFn: () => DB.getDocument(DB_ID, COLLECTION_CUSTOMERS, customerId),
 });
 
+// Set form values once data is successfully loaded
 watch(isSuccess, () => {
-  const initialData = data.value as unknown as ICustomerFormState;
-  setValues({
-    email: initialData.email,
-    name: initialData.name,
-    avatar_url: initialData.avatar_url,
-    from_source: initialData.from_source,
-  });
+  if (data.value) {
+    setValues({
+      email: data.value.email,
+      name: data.value.name,
+      avatar_url: data.value.avatar_url,
+      from_source: data.value.from_source,
+    });
+  }
 });
 
 const [name, nameAttrs] = defineField("name");
@@ -53,10 +54,10 @@ const { mutate, isPending } = useMutation({
     DB.updateDocument(DB_ID, COLLECTION_CUSTOMERS, customerId, data),
 });
 
+// Image upload mutation
 const { mutate: uploadImage, isPending: isUploadImagePending } = useMutation({
   mutationKey: ["uploadImage"],
   mutationFn: (file: File) => storage.createFile(STORAGE_ID, uuid(), file),
-
   onSuccess(data) {
     const response = storage.getFileDownload(STORAGE_ID, data.$id);
     setFieldValue("avatar_url", response);
@@ -79,7 +80,7 @@ function handleFileChange(event: InputFileEvent) {
   <div class="p-10">
     <h1 class="font-bold text-2xl mb-10">
       <span class="mr-2">Editing</span>
-      {{ (data as unknown as ICustomerFormState)?.name }}
+      {{ values.name }}
     </h1>
 
     <form @submit="onSubmit" class="form">
@@ -108,7 +109,7 @@ function handleFileChange(event: InputFileEvent) {
       <img
         v-if="values.avatar_url || isUploadImagePending"
         :src="values.avatar_url"
-        alt=""
+        alt="Avatar"
         width="50"
         height="50"
         class="rounded-full my-4"
