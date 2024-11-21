@@ -1,4 +1,3 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: "2024-04-03",
   ssr: true,
@@ -26,7 +25,14 @@ export default defineNuxtConfig({
   ],
   shadcn: {
     prefix: "Ui",
-
     componentDir: "./components/ui",
+  },
+
+  // Correctly using runtimeConfig to expose environment variables
+  runtimeConfig: {
+    public: {
+      appwriteEndpoint: process.env.VUE_APP_APPWRITE_ENDPOINT,
+      appwriteProjectId: process.env.VUE_APP_APPWRITE_PROJECT_ID,
+    },
   },
 });

@@ -6,6 +6,10 @@ import { COLLECTION_CUSTOMERS, DB_ID, STORAGE_ID } from "@/utils/app.constants";
 import type { ICustomer } from "~/types/deals.types";
 import { account } from "~~/utils/appwrite";
 
+const config = useRuntimeConfig();
+const endpoint = config.public.appwriteEndpoint;
+const projectId = config.public.appwriteProjectId;
+
 interface InputFileEvent extends Event {
   target: HTMLInputElement;
 }
