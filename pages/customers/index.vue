@@ -21,7 +21,7 @@ const { data: customers, isLoading } = useQuery({
     <UiTable v-else>
       <UiTableHeader>
         <UiTableRow>
-          <UiTableHead class="w-[200px]"> Image </UiTableHead>
+          <UiTableHead class="w-[200px]">Image</UiTableHead>
           <UiTableHead class="w-[300px]">Apellation</UiTableHead>
           <UiTableHead class="w-[300px]">Email</UiTableHead>
           <UiTableHead>From</UiTableHead>

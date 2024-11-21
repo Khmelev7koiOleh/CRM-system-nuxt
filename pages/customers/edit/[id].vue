@@ -1,16 +1,10 @@
 <script setup lang="ts">
-import { onMounted, watch } from "vue";
 import { storage, DB } from "@/utils/appwrite"; // Import appwrite services
 import { v4 as uuid } from "uuid"; // Import uuid for unique file ids
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import { COLLECTION_CUSTOMERS, DB_ID, STORAGE_ID } from "@/utils/app.constants";
 import type { ICustomer } from "~/types/deals.types";
-
-import { account, databases, storageA } from "~/services/appwrite"; // Adjust the path based on your actual directory structure
-
-const config = useRuntimeConfig();
-const endpoint = config.public.appwriteEndpoint;
-const projectId = config.public.appwriteProjectId;
+import { account } from "~~/utils/appwrite";
 
 interface InputFileEvent extends Event {
   target: HTMLInputElement;
@@ -27,81 +21,54 @@ useHead({
 const route = useRoute();
 const customerId = route.params.id as string;
 
-// Define form state and helpers
 const { handleSubmit, defineField, setFieldValue, setValues, values } =
   useForm<ICustomerFormState>();
 
-// Fetch customer data from Appwrite and map it to ICustomerFormState
 const { data, isSuccess } = useQuery({
   queryKey: ["getCustomer", customerId],
-  queryFn: async () => {
-    const doc = await DB.getDocument(DB_ID, COLLECTION_CUSTOMERS, customerId);
-    // Transform the document into ICustomerFormState format
-    return {
-      email: doc.email, // Assuming the document has these fields
-      name: doc.name,
-      avatar_url: doc.avatar_url,
-      from_source: doc.from_source,
-    };
-  },
+  queryFn: () => DB.getDocument(DB_ID, COLLECTION_CUSTOMERS, customerId),
 });
 
-// Set form values after the data is fetched
 watch(isSuccess, () => {
-  if (data.value) {
-    const initialData = data.value as ICustomerFormState;
-    setValues({
-      email: initialData.email,
-      name: initialData.name,
-      avatar_url: initialData.avatar_url,
-      from_source: initialData.from_source,
-    });
-  }
+  const initialData = data.value as unknown as ICustomerFormState;
+  setValues({
+    email: initialData.email,
+    name: initialData.name,
+    avatar_url: initialData.avatar_url,
+    from_source: initialData.from_source,
+  });
 });
 
 const [name, nameAttrs] = defineField("name");
 const [email, emailAttrs] = defineField("email");
 const [from_source, from_sourceAttrs] = defineField("from_source");
 
-// Mutation to update customer data
 const { mutate, isPending } = useMutation({
   mutationKey: ["update customer", customerId],
   mutationFn: (data: ICustomerFormState) =>
     DB.updateDocument(DB_ID, COLLECTION_CUSTOMERS, customerId, data),
 });
 
-// Mutation to upload the avatar image
 const { mutate: uploadImage, isPending: isUploadImagePending } = useMutation({
   mutationKey: ["uploadImage"],
   mutationFn: (file: File) => storage.createFile(STORAGE_ID, uuid(), file),
-  /**
-   * Updates the avatar_url form field with the URL of the uploaded image.
-   * @param {{ $id: string }} data - The response data from the mutation.
-   */
+
   onSuccess(data) {
     const response = storage.getFileDownload(STORAGE_ID, data.$id);
     setFieldValue("avatar_url", response);
   },
 });
 
-// Form submit handler
 const onSubmit = handleSubmit((values) => {
   mutate(values);
 });
 
-// Handle file input change for uploading an avatar
 function handleFileChange(event: InputFileEvent) {
   const file = event.target.files?.[0];
   if (file) {
     uploadImage(file);
   }
 }
-
-onMounted(() => {
-  console.log("Endpoint:", import.meta.env.VITE_APPWRITE_ENDPOINT);
-  console.log("Project ID:", import.meta.env.VITE_APPWRITE_PROJECT_ID);
-  console.log("Customer Data:", data);
-});
 </script>
 
 <template>
@@ -134,17 +101,15 @@ onMounted(() => {
         class="input"
       />
 
-      <!-- Avatar Image Preview -->
       <img
         v-if="values.avatar_url || isUploadImagePending"
         :src="values.avatar_url"
-        alt="Avatar"
+        alt=""
         width="50"
         height="50"
         class="rounded-full my-4"
       />
 
-      <!-- File Upload Input -->
       <div class="grid w-full max-w-sm items-center gap-1.5 input">
         <label>
           <div class="text-sm mb-2">Logo</div>
@@ -156,7 +121,6 @@ onMounted(() => {
         </label>
       </div>
 
-      <!-- Submit Button -->
       <UiButton :disabled="isPending" variant="secondary" class="mt-3">
         {{ isPending ? "Loading..." : "Save" }}
       </UiButton>

@@ -1,14 +1,16 @@
+import { APP_WRITE_ID } from "@/utils/app.constants";
 import { Account, Client, Databases, Storage } from "appwrite";
 
-// Initialize the client
-const client = new Client();
+// Initialize Appwrite client
+const client = new Client()
+  .setEndpoint("https://cloud.appwrite.io/v1") // Appwrite cloud URL
+  .setProject(APP_WRITE_ID); // Your Appwrite project ID
 
-// Set the endpoint using the environment variables
-client
-  .setEndpoint(import.meta.env.VITE_APPWRITE_ENDPOINT) // Use VITE_ prefix
-  .setProject(import.meta.env.VITE_APPWRITE_PROJECT_ID); // Use VITE_ prefix
+// Initialize Appwrite storage
+export const storage = new Storage(client);
 
 export const account = new Account(client);
+
 export { ID } from "appwrite";
+
 export const DB = new Databases(client);
-export const storage = new Storage(client);
